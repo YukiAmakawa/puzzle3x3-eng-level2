@@ -6,15 +6,15 @@
     <meta charset="UTF-8">
     <style>
         body {
+            background-color: floralwhite;
             font-family: sans-serif;
             text-align: center;
-            background-color: floralwhite;
         }
 
         .explanation {
-            font-size: 30px;
             padding-top: 120px;
             padding-bottom: 100px;
+            font-size: 30px;
         }
 
         #puzzle {
@@ -26,19 +26,19 @@
         .tile {
             width: 230px;
             height: 230px;
-            border: 2px solid gray;
-            border-radius: 40px;
+            background-color: white;
             color: white ;
             font-size: 40px;
             font-weight: bold;
-            background-color: white;
+            border: 2px solid gray;
+            border-radius: 40px;
         }
 
         #correct {
-            position: absolute;
             width: 100%;
-            top: 2.5em;
+            position: absolute;
             background-color: deeppink;
+            top: 2.5em;
             color: white;
             font-size: 80px;
             opacity: 0.9;
@@ -93,6 +93,7 @@
         function init() {
             var table = document.getElementById("table");
             for (var i = 0; i < 3; i++) {
+                //HTML要素trを生成
                 var tr = document.createElement("tr");
                 for (var j = 0; j < 3; j++) {
                     var td = document.createElement("td");
@@ -100,23 +101,34 @@
                     td.className = "tile";
                     td.index = index;
                     td.value = index;
+                    //if(index==0){return ""}else{return numbers[index]}
                     td.textContent = index == 0 ? "" : numbers[index];
                     td.onclick = click;
+                    //tr行にtdマスを挿入する
+                    //appendChild()親要素の中に子要素を追加
                     tr.appendChild(td);
+                    //td.clasName以下の情報をtilesに渡す　
+                    //push()配列の最後に要素を追加
                     tiles.push(td);
                 }
                 table.appendChild(tr);
             }
-            for (var i = 0; i < 1000; i++) {
+            for (var i = 0; i < 100; i++) {
                 click({
+                    //srcElement イベントが発生した要素を示すオブジェクト
                     srcElement: {
+                        //Math.floor　少数切り捨て　random 今回は0-8の値を返す
                         index: Math.floor(Math.random() * 9)
                     }
                 });
             }
+            //数字シャッフルが完了するまではinit_flagをfalseにする
+            //init_flagがtrueでないとクリアメッセージは出ない=シャッフル中にはクリアメッセージは出ない
             init_flag = true;
         }
             function swap(i, j) {
+                //tmpに一度valueとtextを入れる
+                //3, 4行目でjの値を代入したときにiの値が上書きされて消えるのを防ぐ
                 var tmp = tiles[i].value;
                 var tmp_text = tiles[i].textContent;
                 tiles[i].value = tiles[j].value;
@@ -148,8 +160,11 @@
         }
 
         function next() {
+            //splice 配列tilesの0番目からtiles.length番目の要素を取り除く＝空にする
             tiles.splice(0, tiles.length);
+            //パズルHTMLが生成され数字シャッフル完了までfalse
             init_flag = false;
+            //レベル１はtrue　2はfalse クリアメッセージの区別
             state = true;
             var table = document.getElementById("table");
             for (var r = 0; r < 3; r++) {
@@ -170,7 +185,7 @@
                 }
                 table.appendChild(tr);
             }
-            for (var i = 0; i < 1000; i++) {
+            for (var i = 0; i < 100; i++) {
                 click({
                     srcElement: {
                         index: Math.floor(Math.random() * 9)
@@ -214,40 +229,46 @@
             document.getElementById("level2").classList.add("none");
             init();
         }
-
+        
+        //カードの入れ替え
         function click(e) {
             var isAllCardCompleted = false;
             var i = e.srcElement.index;
+            //最上段以外　上が空欄の場合
             if (i - 3 >= 0 && tiles[i - 3].value == 0) {
                 swap(i, i - 3);
+            //最下段以外　したが空欄の場合
             } else if (i + 3 < 9 && tiles[i + 3].value == 0) {
                 swap(i, i + 3);
+            //左列以外　左が空欄の場合
             } else if (i % 3 != 0 && tiles[i - 1].value == 0) {
                 swap(i, i - 1);
+            //右列以外　右側が空欄の場合
             } else if (i % 3 != 2 && tiles[i + 1].value == 0) {
                 swap(i, i + 1);
             }
-
+            //左上が空欄（正しい位置）の時のみ他のマスが正しいかどうか調べる
             if (tiles[0].value == 0 && init_flag == true) {
-                //全てのパネルの表示があっているかどうか
                 for (var j = 1; j < (3 * 3); j++) {
                     if (tiles[j].index != tiles[j].value) {
                         break;
                     }
+                    //最後のマスも正しいとき
                     if (j == (3 * 3 - 1)) isAllCardCompleted = true;
                 }
-                //全てのパネルの表示があっていたら、画像を表示
+                //全てのマスが正しいければクリアメッセージ表示
                 if (isAllCardCompleted == true) {
                     //共通
                     document.getElementById("correct").classList.remove("none");
                     document.getElementById("correct").classList.add("display");
-                    //1回目だったら
+                    //レベル1
                     if(state == false){
                     document.getElementById("onceMore").classList.remove("none");
                     document.getElementById("onceMore").classList.add("display");
                     document.getElementById("next").classList.remove("none");
                     document.getElementById("next").classList.add("display");
                     }
+                    //レベル2
                     else{
                     document.getElementById("onceMore").classList.remove("none");
                     document.getElementById("onceMore").classList.add("display");
